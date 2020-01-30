@@ -1,0 +1,6 @@
+---
+- import_tasks: add-dns.yml
+- import_tasks: kube-dependencies.yml
+- import_tasks: master.yml
+- import_tasks: worker.yml
+...

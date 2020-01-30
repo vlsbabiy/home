@@ -1,0 +1,19 @@
+---
+- hosts: all
+  tasks:
+    - name: add master ip
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ip-master }} master-node"
+        create: no
+    - name: add worker1 ip
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ip-worker1 }} worker-node1"
+        create: no
+    - name: add worker2 ip
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ip-worker2 }} worker-node2"
+        create: no
+...

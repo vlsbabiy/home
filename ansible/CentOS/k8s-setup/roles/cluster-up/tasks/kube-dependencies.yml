@@ -1,0 +1,66 @@
+- hosts: all
+  become: yes
+  tasks:
+   - name: disable selinux now
+     command: setenforce 0
+     when: ansible_selinux.status == "enabled"
+
+   - name: disable selinux on reboot
+     selinux: state=disabled
+
+   - name: conf set
+     command: modprobe {{ item }}
+     loop: "{{ ip_modules }}"
+
+   - name: iptables configration
+     become: yes
+     sysctl:
+      name: "{{ item }}"
+      value: 1
+      state: present
+     with_items:
+       - net.bridge.bridge-nf-call-ip6tables
+       - net.bridge.bridge-nf-call-iptables
+
+   - name: add k8s repo
+     yum_repository:
+      name: Kubernetes
+      description: Kubernetes YUM repository
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      gpgcheck: yes
+
+   - name: install packages
+     yum:
+       name: "{{ packages }}"
+       state: present
+       update_cache: true
+
+   - name: yum upgrade
+     yum:
+       name: '*'
+       state: latest
+
+   - name: enable services
+     service:
+       name: "{{ item }}"
+       state: started
+       enabled: yes
+     with_items:
+       - kubelet
+       - docker
+
+   - name: disable swap
+     shell: swapoff -a
+
+   - name: disable swap in fstab
+     replace:
+       path: /etc/fstab
+       regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+       replace: '# \1'
+
+- hosts: master
+  become: yes
+  tasks:
+   - name: install kubectl
+     yum: name=kubectl state=present

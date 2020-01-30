@@ -1,0 +1,18 @@
+---
+ip-master: 127.0.0.1
+ip-worker1: 127.0.0.2
+ip-worker2: 127.0.0.3
+
+ip_modules:
+  - ip_vs
+  - ip_vs_rr
+  - ip_vs_wrr
+  - ip_vs_sh
+  - nf_conntrack_ipv4
+  - br_netfilter
+
+packages:
+  - docker
+  - kubelet
+  - kubeadm
+...

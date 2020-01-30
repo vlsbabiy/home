@@ -1,0 +1,14 @@
+[master]
+ip-master
+
+[worker]
+ip-worker1
+ip-worker2
+
+[all:children]
+master
+worker
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=vlad
